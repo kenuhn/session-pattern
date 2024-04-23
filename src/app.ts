@@ -1,3 +1,4 @@
+import cookieParser from "cookie-parser";
 import { randomUUID, UUID } from "crypto";
 import dotenv from "dotenv";
 import express, { Router } from "express";
@@ -20,6 +21,8 @@ const user = {
   email: "admin",
   password: "admin",
 };
+
+app.use(cookieParser());
 
 route.get("/", (req, res) => {
   try {
@@ -50,14 +53,14 @@ route.get("/login/:email/:password", (req, res) => {
   }
 });
 
-route.get("/logout", (req, res) => {
+route.get("/logout", async (req, res) => {
   try {
-    const sessionID = req.cookies("uid");
-
-    if (session[sessionID]) {
-      delete session[sessionID];
+    const { uid } = await req.cookies;
+    if (session[uid]) {
+      delete session[uid];
       res.send({ message: "session deleted" });
     }
+    res.send({ message: "no session to delete" });
   } catch (error) {
     res.status(400).json({ message: "error in logout session" });
   }
